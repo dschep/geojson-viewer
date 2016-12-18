@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+<style>
+html, body, #map {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+</style>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<script>
+var map = L.map('map');
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+function onEachFeature(feature, layer) {
+  layer.bindPopup(Object.entries(feature.properties).map((prop) => prop.join(': ')).join('<br>'));
+}
+
+
+fetch(window.location.hash.slice(1), {cors: true})
+.then((resp) => resp.json())
+.then((json) => map.fitBounds(L.geoJson(json, {onEachFeature}).addTo(map).getBounds()))
+</script>
