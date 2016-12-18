@@ -12,17 +12,30 @@ html, body, #map {
 <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
 <script>
 var map = L.map('map');
+var layer;
 
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
 function onEachFeature(feature, layer) {
-  layer.bindPopup(Object.entries(feature.properties).map((prop) => prop.join(': ')).join('<br>'));
+  if (feature.properties)
+    layer.bindPopup(Object.entries(feature.properties).map((prop) => prop.join(': ')).join('<br>'));
 }
 
 
-fetch(window.location.hash.slice(1), {cors: true})
-.then((resp) => resp.json())
-.then((json) => map.fitBounds(L.geoJson(json, {onEachFeature}).addTo(map).getBounds()))
+function updateGeoJson() {
+  if (layer) {
+    map.removeLayer(layer);
+    layer = undefined;
+  }
+  fetch(window.location.hash.slice(1), {cors: true})
+  .then((resp) => resp.json())
+  .then((json) => {
+    layer = L.geoJson(json, {onEachFeature}).addTo(map);
+    map.fitBounds(layer.getBounds());
+  })
+}
+updateGeoJson();
+window.onhashchange = updateGeoJson;
 </script>
