@@ -39,6 +39,7 @@ function updateGeoJson() {
     layer = L.geoJson(json, {onEachFeature}).addTo(map);
     map.fitBounds(layer.getBounds());
   })
+  .catch(() => alert('Error loading or parsing GeoJSON'))
 }
 updateGeoJson();
 window.onhashchange = updateGeoJson;
